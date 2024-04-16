@@ -1,0 +1,66 @@
+enum ListingStatus {
+  Open
+  Cancelled
+  Accepted
+}
+
+enum TokenType {
+  ERC1155
+  ERC721
+}
+
+enum ListingType {
+  Fixed
+  Auction
+}
+
+type AuctionBufferInfo @entity {
+  id: ID!
+  timeBuffer: BigInt!
+  bpBuffer: BigInt!
+}
+
+type Listing @entity {
+  id: ID!
+  assetAddress: Bytes!
+  lister: User!
+  tokenId: BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+  quantity: BigInt!
+  currency: Bytes!
+  reservePricePerToken: BigInt!
+  buyoutPricePerToken: BigInt!
+  tokenType: TokenType!
+  listingType: ListingType!
+  offers: [Offer!]! @derivedFrom(field: "listingId")
+  bidAccepted: Boolean!
+  listingAccepted: Boolean!
+  status: ListingStatus!
+  createdAt: BigInt!
+}
+
+type Offer @entity {
+  id: ID!
+  listingId: Listing!
+  offeror: User!
+  listingType: ListingType!
+  quantity: BigInt!
+  price: BigInt!
+  currency: Bytes!
+  createdAt: BigInt!
+}
+
+type User @entity {
+  id: Bytes!
+  listings: [Listing!]! @derivedFrom(field: "lister")
+  offers: [Offer!]! @derivedFrom(field: "offeror")
+  collections: [Collection!]! @derivedFrom(field: "lister")
+}
+
+type Collection @entity {
+  id: Bytes!
+  lister: User!
+  image: String!
+  disabled: Boolean!
+}
